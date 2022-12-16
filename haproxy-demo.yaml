@@ -1,0 +1,677 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: haproxy-demo
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ws1-conf
+  namespace: haproxy-demo
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes  1;
+    events {
+      worker_connections  10240;
+    }
+    http {
+      server {
+          listen       80;
+          server_name  localhost;
+          location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+      }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ws1-data
+  namespace: haproxy-demo
+data:
+  index.html: |
+    <html><head></head><body><h1>WS1</h1></body></html>
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ws1
+  namespace: haproxy-demo
+spec:
+  selector:
+    matchLabels:
+      app: ws1
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ws1
+    spec:
+      containers:
+      - name: ws1
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+            - name: ws1-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+            - name: ws1-data
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+              readOnly: true
+      volumes:
+      - name: ws1-conf
+        configMap:
+          name: ws1-conf
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+      - name: ws1-data
+        configMap:
+          name: ws1-data
+          items:
+            - key: index.html
+              path: index.html
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: haproxy-demo
+  name: ws1
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ws1
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ws2-conf
+  namespace: haproxy-demo
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes  1;
+    events {
+      worker_connections  10240;
+    }
+    http {
+      server {
+          listen       80;
+          server_name  localhost;
+          location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+      }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ws2-data
+  namespace: haproxy-demo
+data:
+  index.html: |
+    <html><head></head><body><h1>WS2</h1></body></html>
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ws2
+  namespace: haproxy-demo
+spec:
+  selector:
+    matchLabels:
+      app: ws2
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ws2
+    spec:
+      containers:
+      - name: ws2
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+            - name: ws2-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+            - name: ws2-data
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+              readOnly: true
+      volumes:
+      - name: ws2-conf
+        configMap:
+          name: ws2-conf
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+      - name: ws2-data
+        configMap:
+          name: ws2-data
+          items:
+            - key: index.html
+              path: index.html
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: haproxy-demo
+  name: ws2
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ws2
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ws3-conf
+  namespace: haproxy-demo
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes  1;
+    events {
+      worker_connections  10240;
+    }
+    http {
+      server {
+          listen       80;
+          server_name  localhost;
+          location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+      }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ws3-data
+  namespace: haproxy-demo
+data:
+  index.html: |
+    <html><head></head><body><h1>WS3</h1></body></html>
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ws3
+  namespace: haproxy-demo
+spec:
+  selector:
+    matchLabels:
+      app: ws3
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ws3
+    spec:
+      containers:
+      - name: ws3
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+            - name: ws3-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+            - name: ws3-data
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+              readOnly: true
+      volumes:
+      - name: ws3-conf
+        configMap:
+          name: ws3-conf
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+      - name: ws3-data
+        configMap:
+          name: ws3-data
+          items:
+            - key: index.html
+              path: index.html
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: haproxy-demo
+  name: ws3
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ws3
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ws4-conf
+  namespace: haproxy-demo
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes  1;
+    events {
+      worker_connections  10240;
+    }
+    http {
+      server {
+          listen       80;
+          server_name  localhost;
+          location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+      }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ws4-data
+  namespace: haproxy-demo
+data:
+  index.html: |
+    <html><head></head><body><h1>WS4</h1></body></html>
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ws4
+  namespace: haproxy-demo
+spec:
+  selector:
+    matchLabels:
+      app: ws4
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ws4
+    spec:
+      containers:
+      - name: ws4
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+            - name: ws4-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+            - name: ws4-data
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+              readOnly: true
+      volumes:
+      - name: ws4-conf
+        configMap:
+          name: ws4-conf
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+      - name: ws4-data
+        configMap:
+          name: ws4-data
+          items:
+            - key: index.html
+              path: index.html
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: haproxy-demo
+  name: ws4
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ws4
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ws5-conf
+  namespace: haproxy-demo
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes  1;
+    events {
+      worker_connections  10240;
+    }
+    http {
+      server {
+          listen       80;
+          server_name  localhost;
+          location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+      }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ws5-data
+  namespace: haproxy-demo
+data:
+  index.html: |
+    <html><head></head><body><h1>WS5</h1></body></html>
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ws5
+  namespace: haproxy-demo
+spec:
+  selector:
+    matchLabels:
+      app: ws5
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ws5
+    spec:
+      containers:
+      - name: ws5
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+            - name: ws5-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+            - name: ws5-data
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+              readOnly: true
+      volumes:
+      - name: ws5-conf
+        configMap:
+          name: ws5-conf
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+      - name: ws5-data
+        configMap:
+          name: ws5-data
+          items:
+            - key: index.html
+              path: index.html
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: haproxy-demo
+  name: ws5
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ws5
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ws6-conf
+  namespace: haproxy-demo
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes  1;
+    events {
+      worker_connections  10240;
+    }
+    http {
+      server {
+          listen       80;
+          server_name  localhost;
+          location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+      }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ws6-data
+  namespace: haproxy-demo
+data:
+  index.html: |
+    <html><head></head><body><h1>WS6</h1></body></html>
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ws6
+  namespace: haproxy-demo
+spec:
+  selector:
+    matchLabels:
+      app: ws6
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ws6
+    spec:
+      containers:
+      - name: ws6
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+            - name: ws6-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+            - name: ws6-data
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+              readOnly: true
+      volumes:
+      - name: ws6-conf
+        configMap:
+          name: ws6-conf
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+      - name: ws6-data
+        configMap:
+          name: ws6-data
+          items:
+            - key: index.html
+              path: index.html
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: haproxy-demo
+  name: ws6
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ws6
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haproxy1-conf
+  namespace: haproxy-demo
+data:
+  haproxy.cfg: |
+    global
+    log         127.0.0.1 local2
+
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    user        haproxy
+    group       haproxy
+    # daemon
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+
+    defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          1m
+    timeout server          1m
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 3000
+
+    frontend  main
+    bind *:80
+    default_backend             my_be
+
+    backend my_be
+    balance     roundrobin
+    server  app1 ws1.haproxy-demo.svc.cluster.local:80 check
+    server  app2 ws2.haproxy-demo.svc.cluster.local:80 check
+    server  app3 ws3.haproxy-demo.svc.cluster.local:80 check
+    server  app4 ws4.haproxy-demo.svc.cluster.local:80 check
+    server  app5 ws5.haproxy-demo.svc.cluster.local:80 check
+    server  app6 ws6.haproxy-demo.svc.cluster.local:80 check
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: haproxy1
+  namespace: haproxy-demo
+spec:
+  selector:
+    matchLabels:
+      app: haproxy1
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: haproxy1
+    spec:
+      containers:
+      - name: haproxy1
+        image: haproxytech/haproxy-debian
+        ports:
+        - containerPort: 80
+        volumeMounts:
+            - name: haproxy1-conf
+              mountPath: /etc/haproxy/haproxy.cfg
+              subPath: haproxy.cfg
+              readOnly: true
+      volumes:
+      - name: haproxy1-conf
+        configMap:
+          name: haproxy1-conf
+          items:
+            - key: haproxy.cfg
+              path: haproxy.cfg
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: haproxy-demo
+  name: haproxy1
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30080
+  - name: https
+    protocol: TCP
+    port: 443
+    targetPort: 443
+    nodePort: 30443
+  - name: stat
+    protocol: TCP
+    port: 1024
+    targetPort: 1024
+    nodePort: 31024
+  selector:
+    app: haproxy1
