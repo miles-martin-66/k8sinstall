@@ -83,5 +83,10 @@ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.5
 curl https://raw.githubusercontent.com/projectcalico/calico/v3.24.5/manifests/custom-resources.yaml -o calico-custom-resources.yaml
 sed -i "s|cidr: 192.168.0.0/16|cidr: 10.244.0.0/16|" calico-custom-resources.yaml
 kubectl create -f  ./calico-custom-resources.yaml
+
+curl -L https://github.com/projectcalico/calico/releases/download/v3.24.5/calicoctl-linux-amd64 -o calicoctl
+chmod +x ./calicoctl
+cp calicoctl /usr/local/bin/
+
 kubectl taint node debian node-role.kubernetes.io/control-plane-
 
