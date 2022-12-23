@@ -94,3 +94,23 @@ cp calicoctl /usr/local/bin/
 
 kubectl taint node debian node-role.kubernetes.io/control-plane-
 
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
+kubectl wait --namespace metallb-system --for=condition=ready pod --selector=app=metallb --timeout=90s
+cat <<EOF | sudo tee ./metallb.yaml
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: example
+  namespace: metallb-system
+spec:
+  addresses:
+  - 192.168.1.51-192.168.1.54
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: empty
+  namespace: metallb-system
+EOF
+kubectl apply -f ./metallb.yaml
+
