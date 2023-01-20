@@ -9,7 +9,7 @@ apt-get update
 apt-get upgrade -y
 
 # Install a few extras, and remove nano
-apt install wget vim sudo -y
+apt install wget curl vim sudo -y
 apt remove nano -y
 
 # add necessary kernel modules
