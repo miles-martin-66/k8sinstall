@@ -1,0 +1,113 @@
+#  intarnal installation with config maps for control of haproxy.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haproxy1-conf
+  namespace: haproxy-demo
+data:
+  haproxy.cfg: |
+    global
+    log         127.0.0.1 local2
+
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    user        haproxy
+    group       haproxy
+    # daemon
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+
+    defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          1m
+    timeout server          1m
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 3000
+
+    frontend  main
+    bind *:80
+    default_backend             my_be
+
+    backend my_be
+    balance     roundrobin
+    server  app1 ws1.haproxy-demo.svc.cluster.local:80 check
+    server  app2 ws2.haproxy-demo.svc.cluster.local:80 check
+    server  app3 ws3.haproxy-demo.svc.cluster.local:80 check
+    server  app4 ws4.haproxy-demo.svc.cluster.local:80 check
+    server  app5 ws5.haproxy-demo.svc.cluster.local:80 check
+    server  app6 ws6.haproxy-demo.svc.cluster.local:80 check
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: haproxy1
+  namespace: haproxy-demo
+spec:
+  selector:
+    matchLabels:
+      app: haproxy1
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: haproxy1
+    spec:
+      containers:
+      - name: haproxy1
+        image: haproxytech/haproxy-debian
+        ports:
+        - containerPort: 80
+        volumeMounts:
+            - name: haproxy1-conf
+              mountPath: /etc/haproxy/haproxy.cfg
+              subPath: haproxy.cfg
+              readOnly: true
+      volumes:
+      - name: haproxy1-conf
+        configMap:
+          name: haproxy1-conf
+          items:
+            - key: haproxy.cfg
+              path: haproxy.cfg
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: haproxy-demo
+  name: haproxy1
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30080
+  - name: https
+    protocol: TCP
+    port: 443
+    targetPort: 443
+    nodePort: 30443
+  - name: stat
+    protocol: TCP
+    port: 1024
+    targetPort: 1024
+    nodePort: 31024
+  selector:
+    app: haproxy1

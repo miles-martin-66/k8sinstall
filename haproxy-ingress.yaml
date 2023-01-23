@@ -124,7 +124,9 @@ spec:
       - name: haproxy-ingress
         image: haproxytech/kubernetes-ingress
         args:
+# added ingress.class=haproxy.
           - --configmap=haproxy-controller/haproxy-kubernetes-ingress
+          - --ingress.class=haproxy
         securityContext:
           runAsUser:  1000
           runAsGroup: 1000
@@ -171,6 +173,7 @@ spec:
   selector:
     run: haproxy-ingress
   type: LoadBalancer
+#  type: NodePort
   ports:
   - name: http
     port: 80
